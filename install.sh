@@ -13,6 +13,15 @@ if [[ $(id -u) != 0 ]]; then
     exit 0
 fi
 
+
+if [[ ! -d $LOCALPATH/tools ]]; then
+    mkdir $LOCALPATH/tools
+fi
+
+if [[ ! -d $LOCALPATH/subdomains ]]; then
+    mkdir $LOCALPATH/subdomains
+fi
+
 echo -e "${RED}[+] Installing all requirements${NC}"
 sudo apt-get update && sudo apt-get install golang gzip zip git python3-pip -y
 
