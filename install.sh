@@ -50,4 +50,10 @@ wget https://github.com/tomnomnom/assetfinder/releases/download/v0.1.1/assetfind
 wait
 gunzip -c assetfinder-linux-amd64-0.1.1.tgz |tar xvf -
 chmod +x assetfinder
+
+echo -e "${RED}[+] Setting permissions back to $SUDO_USER ${NC}"
+cd $LOCALPATH/
+chown -R $SUDO_USER.$SUDO_USER * 
+
+
 echo -e "${GREEN}[+] DONE${NC}"
