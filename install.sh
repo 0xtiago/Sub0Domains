@@ -22,6 +22,12 @@ if [[ ! -d $LOCALPATH/subdomains ]]; then
     mkdir $LOCALPATH/subdomains
 fi
 
+if [[ ! -e $LOCALPATH/targets.txt ]]; then
+    touch $LOCALPATH/targets.txt
+    echo "tesla.com" >> targets.txt
+    echo "microsoft.com" >> targets.txt
+fi
+
 echo -e "${RED}[+] Installing all requirements${NC}"
 sudo apt-get update && sudo apt-get install golang gzip zip git python3-pip -y
 
