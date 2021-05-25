@@ -3,3 +3,4 @@ tools/**
 targets.txt
 tests.sh
 api.config
+api.config_tiago
