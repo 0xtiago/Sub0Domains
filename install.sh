@@ -1,12 +1,17 @@
 #!/bin/bash
 
+LOCALPATH=$(pwd)
+
 #COLORS
+#========================================
 #https://www.shellhacks.com/bash-colors/
 RED='\e[31m'
 GREEN='\e[32m'
+CYAN='\e[36m'
+PURPLE='\e[35m'
+YELLOW='\e[33m'
 NC='\e[0m' # No Color
-
-LOCALPATH=$(pwd)
+#========================================
 
 if [[ $(id -u) != 0 ]]; then
     echo -e "\n[!] Install.sh need to run as root or sudoer"
@@ -27,6 +32,12 @@ if [[ ! -e $LOCALPATH/targets.txt ]]; then
     echo "tesla.com" >> targets.txt
     echo "microsoft.com" >> targets.txt
 fi
+
+#if [[ ! -e $LOCALPATH/api.config ]]; then
+#    touch $LOCALPATH/api.config
+#    echo "censys=" >> api.config
+#    echo "shodan=" >> api.config
+#fi
 
 echo -e "${RED}[+] Installing all requirements${NC}"
 sudo apt-get update && sudo apt-get install golang gzip zip git python3-pip -y

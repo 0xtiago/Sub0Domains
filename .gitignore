@@ -1,3 +1,5 @@
 subdomains/**
 tools/**
 targets.txt
+tests.sh
+api.config

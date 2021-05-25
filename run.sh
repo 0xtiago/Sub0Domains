@@ -13,6 +13,7 @@ NC='\e[0m' # No Color
 
 #PATHS
 #========================================
+LOCALPATH=$(pwd)
 OUT_DIR=$(pwd)/subdomains
 TOOLS_DIR=$(pwd)/tools
 #========================================
@@ -23,21 +24,41 @@ d=$(date +%Y-%m-%d)
 y=$(date -d yesterday +%Y-%m-%d)
 #========================================
 
+#CHECK API FILE EXISTENCE AND CONFIGURE VARIABLES
+#========================================
+API_FILE=$LOCALPATH/api.config
+
+if [ -f "$API_FILE" ]; then
+    API_EXISTS=1
+    . $API_FILE
+else 
+    API_EXISTS=0
+fi
+
+
+#START SCRIPT
+#========================================
 while read -r TARGET; 
 do
     echo -e "${RED}  ❄️ DOMAIN: ${TARGET} ${NC}"
-    echo -e "${CYAN} [*] Executing SubWalker against: ${TARGET} ${NC}"
-    cd $TOOLS_DIR/subscraper
-    echo -e "${PURPLE} [*] Launching SubScraper... ${NC}"
-    python3 subscraper.py $TARGET -o $OUT_DIR/${TARGET}-subscraper.txt &> /dev/null &
+    echo -e "${CYAN} [*] Executing Sub0Domains against: ${TARGET} ${NC}"
 
-    echo -e "${CYAN} [*] Executing  Sublist3r against: ${TARGET} ${NC}"
+    # Running subscraper
+    cd $TOOLS_DIR/subscraper
+    if [ $API_EXISTS -eq 1 ]; then
+        echo -e "${PURPLE} [*] Launching SubScraper with Censys API... ${NC}"
+        python3 subscraper.py $TARGET --censys-api $censys_api --censys-secret $censys_secret -o $OUT_DIR/${TARGET}-subscraper.txt &> /dev/null &
+    else
+        echo -e "${PURPLE} [*] Launching SubScraper... ${NC}"
+        python3 subscraper.py $TARGET -o $OUT_DIR/${TARGET}-subscraper.txt &> /dev/null &
+    fi
+    
+    # Running Sublist3r
     cd $TOOLS_DIR/Sublist3r
     echo -e "${PURPLE} [*] Launching  Sublist3r... ${NC}"
     python3 sublist3r.py -d $TARGET -o $OUT_DIR/${TARGET}-sublist3r.txt &> /dev/null &
 
-
-    echo -e "${CYAN} [*] Executing  assetfinder against: ${TARGET} ${NC}"
+    # Running assetfinder
     cd $TOOLS_DIR/assetfinder
     echo -e "${PURPLE} [*] Launching assetfinder... ${NC}"
     ./assetfinder --subs-only $TARGET > $OUT_DIR/${TARGET}-assetfinder.txt &
