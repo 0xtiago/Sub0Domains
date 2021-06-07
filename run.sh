@@ -24,17 +24,29 @@ d=$(date +%Y-%m-%d)
 y=$(date -d yesterday +%Y-%m-%d)
 #========================================
 
-#CHECK API FILE EXISTENCE AND CONFIGURE VARIABLES
+#CHECK API FILE EXISTENCE AND ITS CONFIGRATION
 #========================================
 API_FILE=$LOCALPATH/api.config
 
-if [ -f "$API_FILE" ]; then
-    API_EXISTS=1
-    . $API_FILE
-else 
-    API_EXISTS=0
-fi
 
+#CENSYS
+if [ -f "$API_FILE" ]; then
+    echo -e "${GREEN} ⚙️ The API file $API_FILE exists. ${NC}"
+    . $API_FILE
+    if [ -z "$censys_api" ] || [ -z "$censys_secret" ];then
+        echo -e "${RED} ⚙️ Maybe Censys API secrets are empty. ${NC}"
+        
+        echo "$censys_api"
+        echo "$censys_secret"
+        CENSYS_API_OK=1
+    else
+        CENSYS_API_OK=0
+        echo -e "${GREEN} ⚙️ All Censys API secrets in file $API_FILE are filled. But it is not certain that they are valid. 😊 ${NC}"
+    fi
+else 
+    echo -e "${RED} ⚙️ The API file $API_FILE does not exist. ${NC}"
+fi
+#===========================================
 
 #START SCRIPT
 #========================================
@@ -45,7 +57,7 @@ do
 
     # Running subscraper
     cd $TOOLS_DIR/subscraper
-    if [ $API_EXISTS -eq 1 ]; then
+    if [ $CENSYS_API_OK -eq 1 ]; then
         echo -e "${PURPLE} [*] Launching SubScraper with Censys API... ${NC}"
         python3 subscraper.py $TARGET --censys-api $censys_api --censys-secret $censys_secret -o $OUT_DIR/${TARGET}-subscraper.txt &> /dev/null &
     else

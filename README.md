@@ -1,10 +1,12 @@
 # Sub0Domains
 
+![](imagens/Sub0Domains.png)
+
+
+
 **Sub0Domains** is a quite simple bash script subdomain enumeration toolkit. Based on several tool chain script written by several bug hunters, it is just one more else. 
 
 This script was written firstly to attend my own need, executing several subdomain enumeration tools and aggregating their results, avoiding discrepancies.
-
-![](https://res.cloudinary.com/dtr6hzxnx/image/upload/v1621644729/blog/subzero_dvqezk.jpg)
 
 **Tools used:**
 

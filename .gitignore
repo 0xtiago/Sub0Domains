@@ -2,5 +2,5 @@ subdomains/**
 tools/**
 targets.txt
 tests.sh
-api.config
+run_tiago.sh
 api.config_tiago
