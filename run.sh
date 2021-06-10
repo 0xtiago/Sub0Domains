@@ -38,15 +38,17 @@ if [ -f "$API_FILE" ]; then
         
         echo "$censys_api"
         echo "$censys_secret"
-        CENSYS_API_OK=1
+        CENSYS_API_OK="true"
     else
-        CENSYS_API_OK=0
+        CENSYS_API_OK="false"
         echo -e "${GREEN} ⚙️ All Censys API secrets in file $API_FILE are filled. But it is not certain that they are valid. 😊 ${NC}"
     fi
 else 
     echo -e "${RED} ⚙️ The API file $API_FILE does not exist. ${NC}"
 fi
 #===========================================
+
+
 
 #START SCRIPT
 #========================================
@@ -57,7 +59,7 @@ do
 
     # Running subscraper
     cd $TOOLS_DIR/subscraper
-    if [ $CENSYS_API_OK -eq 1 ]; then
+    if [ "$CENSYS_API_OK" == "true" ]; then
         echo -e "${PURPLE} [*] Launching SubScraper with Censys API... ${NC}"
         python3 subscraper.py $TARGET --censys-api $censys_api --censys-secret $censys_secret -o $OUT_DIR/${TARGET}-subscraper.txt &> /dev/null &
     else
@@ -71,9 +73,27 @@ do
     python3 sublist3r.py -d $TARGET -o $OUT_DIR/${TARGET}-sublist3r.txt &> /dev/null &
 
     # Running assetfinder
-    cd $TOOLS_DIR/assetfinder
+    
     echo -e "${PURPLE} [*] Launching assetfinder... ${NC}"
-    ./assetfinder --subs-only $TARGET > $OUT_DIR/${TARGET}-assetfinder.txt &
+    assetfinder --subs-only $TARGET | anew $OUT_DIR/${TARGET}-assetfinder.txt &
+    RES=$(cat $OUT_DIR/${TARGET}-assetfinder.txt | wc -l)
+    echo -e "\n[+] Found ${GREEN} ${RES} ${NC} unique results with assetfinder."
+
+    # Running subfinder
+    echo -e "${PURPLE} [*] Launching subfinder... ${NC}"
+    subfinder -d $TARGET | anew $OUT_DIR/${TARGET}-subfinder.txt &
+    echo -e "${YELLOW} [*] Waiting...${NC}"
+    wait
+    RES=$(cat $OUT_DIR/${TARGET}-subfinder.txt | wc -l)
+    echo -e "\n[+] Found ${GREEN} ${RES} ${NC} unique results with subfinder."
+
+    # Running crt.sh
+    echo -e "${PURPLE} [*] Launching crt.sh... ${NC}"
+    curl -s "https://crt.sh/?q=%25.$TARGET&output=json" | jq -r '.[].name_value' | sed 's/\*\.//g' | anew $OUT_DIR/${TARGET}-crt.sh.txt &
+    echo -e "${YELLOW} [*] Waiting...${NC}"
+    wait
+    RES=$(cat $OUT_DIR/${TARGET}-crt.sh.txt | wc -l)
+    echo -e "\n[+] Found ${GREEN} ${RES} ${NC} unique results with crt.sh."
 
     echo -e "${YELLOW} [*] Waiting until all scripts complete...${NC}"
     wait
